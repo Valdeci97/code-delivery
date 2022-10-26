@@ -9,3 +9,29 @@ services:
       - 3000:3000
     volumes:
       - .:/home/node/app
+    depends_on:
+      - db
+  db:
+    container_name: backend_database
+    image: mongo:6.0.2-focal
+    restart: always
+    volumes:
+      - ./.docker/dbdata:/data/db
+      - ./.docker/mongo:/docker-entrypoint-initdb.d
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=docker
+      - MONGO_INITDB_DATABASE=nest
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=db
+      - ME_CONFIG_MONGODB_AUTH_USERNAME=root
+      - ME_CONFIG_MONGODB_AUTH_PASSWORD=docker
+      - ME_CONFIG_MONGODB_AUTH_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_AUTH_ADMINPASSWORD=docker
+    depends_on:
+      - db
